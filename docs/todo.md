@@ -23,9 +23,9 @@
 - [x] プロジェクト個別 `CLAUDE.md`
 - [x] `README.md`(最小限)
 - [x] `.gitignore`
-- [ ] `git init` + 初回コミット
-- [ ] GitHub public リポジトリ作成 + push
-- [ ] Secret Scanning + Push Protection 有効化
+- [x] `git init` + 初回コミット
+- [x] GitHub public リポジトリ作成 + push(https://github.com/tetutetu214/aws-docs-companion)
+- [x] Secret Scanning + Push Protection 有効化
 
 ### M1: ビルド基盤(chore)
 - [ ] `package.json` 雛形 + 依存追加(vite / @crxjs/vite-plugin / typescript / vitest / eslint / prettier / @mozilla/readability)
