@@ -8,7 +8,7 @@
 
 - [x] Node 22 LTS 環境構築(nvm で v22.22.2、2026-05-12)
 - [x] 理解度テストハーネス 3 問: 全問正解(Manifest V3 SW / Built-in Prompt API / 最小権限、2026-05-12)
-- [ ] てつてつ: 残りの環境確認(`docs/knowledge.md` 1.1〜1.4 = Chrome 138+ / Gemini Nano / ハード要件 / `LanguageModel.availability()`)
+- [x] 環境確認(2026-05-12): Chrome 147.0.7727.139(138+ クリア) / `LanguageModel` API 有効 / `availability()` = `"available"` / 出力言語指定が必要な API 変更を発見しknowledge.mdに記録
 - [ ] **M1: ビルド基盤** 着手中
 
 ---

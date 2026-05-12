@@ -109,6 +109,21 @@ node -v   # v22.22.2 が出ればOK
 }
 ```
 
+### 2026-05-12: Chrome 147 で LanguageModel API が `output language` 指定を要求する
+**発見**: てつてつの実機(Chrome 147.0.7727.139)で `await LanguageModel.availability()` を実行すると `"available"` が返るが、Console に以下の警告が出る:
+> No output language was specified in a LanguageModel API request. An output language should be specified to ensure optimal output quality and properly attest to output safety. Please specify a supported output language code: [en, es, ja]
+
+**意味**:
+- 出力言語の指定が**強く推奨**(現状は警告だが将来 error 化の可能性)
+- サポート言語は `en` / `es` / `ja` のみ(中国語ローカライズ AWS Docs などはスコープ外で既に正解だった)
+
+**実装への影響**:
+1. `src/lib/prompt-api.ts` で `LanguageModel.create()` を呼ぶ際、出力言語に `ja` を指定する必要がある(おそらく `expectedOutputs: [{ type: 'text', languages: ['ja'] }]` 形だが、公式ドキュメントで確定させる)
+2. `src/types/prompt-api.d.ts` の `LanguageModelCreateOptions` に対応プロパティを追加
+3. spec 7.2 のセッション作成パラメータを minor 改訂
+
+**M4 着手時の TODO**: https://developer.chrome.com/docs/ai/prompt-api を WebFetch で確認し、現行版の正確なオプション名を確定する。
+
 ---
 
 ## 4. 決定事項ログ
