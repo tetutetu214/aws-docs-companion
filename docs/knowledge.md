@@ -42,19 +42,14 @@
    - `"unavailable"` → ハード要件未達 or Chrome バージョン未達 / 開発不可
 
 ### 1.5 Node.js 22 LTS
-WSL ターミナルで:
-```bash
-node -v
-```
-`v22.x.x` が表示されること。未インストールなら以下のいずれかで導入:
-```bash
-# nvm を使う場合
-nvm install 22
-nvm use 22
+**ステータス: 完了(2026-05-12)** nvm 経由で v22.22.2(lts/jod)導入済み。
 
-# volta を使う場合
-volta install node@22
+確認コマンド:
+```bash
+node -v   # v22.22.2 が出ればOK
 ```
+
+プロジェクトルートに `.nvmrc` を置いてあるので、新しいシェルで本ディレクトリに `cd` したあと `nvm use` を打てば自動で Node 22 に切り替わる。
 
 ---
 
@@ -72,7 +67,20 @@ volta install node@22
 
 実装中に得た知見をここに追記していく。同じ失敗を繰り返さないために。
 
-(まだなし)
+### 2026-05-12: nvm install 後の `nvm use` が `~/.npmrc` で失敗
+**症状**: `nvm install --lts=jod` でダウンロード自体は成功するが、`nvm use` が
+`Your user's .npmrc file (${HOME}/.npmrc) has a 'globalconfig' and/or a 'prefix' setting, which are incompatible with nvm.`
+を出して shell の Node を切り替えられない。
+
+**原因**: `~/.npmrc` に `prefix=~/.npm-global` が書かれていた。これは sudo なしで `npm install -g` するための一般的なテクニックだが、nvm はバージョンごとに `~/.nvm/versions/node/vX.Y.Z/lib/node_modules` を使うので競合する。
+
+**対処**: `~/.npmrc` を `~/.npmrc.bak` にリネーム。既存の `~/.npm-global/bin` に入っている `cdk` / `wrangler` は `~/.bashrc` の `export PATH=~/.npm-global/bin:$PATH` 設定がそのまま生きているので、Node 22 切替後も引き続き呼べる。
+
+**副作用ゼロ確認**:
+- `which cdk` → `/home/tetutetu/.npm-global/bin/cdk` ✓
+- `which wrangler` → `/home/tetutetu/.npm-global/bin/wrangler` ✓
+
+**戻し方**: `mv ~/.npmrc.bak ~/.npmrc` で完全復元可。
 
 ---
 
@@ -80,7 +88,18 @@ volta install node@22
 
 実装中にした重要な技術判断・設計判断をここに残す。
 
-(まだなし)
+### 2026-05-12: Node 22 LTS 導入方式は nvm
+**判断**: WSL の Node を v20.20.1 → v22.22.2(lts/jod)に切り替える際、`nvm` を採用。
+
+**比較した代替案**: volta、システム置換(NodeSource apt)、Node 20 据え置き。
+
+**採用理由**:
+- バージョンマネージャなのでロールバックが容易(`nvm use 20` で戻せる)
+- 他プロジェクト(mosaic-app / chicken-rag / trip-road)に影響を与えず併存できる
+- `.nvmrc` をプロジェクトに置けば自動切替できる
+- システム置換は不可逆性が高くリスクが大きい
+
+**捨てたもの**: volta が持つ `package.json` の `volta` フィールド統合(現状不要)
 
 ---
 
