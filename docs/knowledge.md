@@ -59,7 +59,9 @@ node -v   # v22.22.2 が出ればOK
 
 | 概念 | 確認日 | メモ |
 |---|---|---|
-| (まだなし) | | |
+| Manifest V3 Service Worker のステートレス設計 | 2026-05-12 | SW はイベントで起動 → 走り終わると Chrome により eviction される「ルータ」として振る舞う。永続状態は `chrome.storage` に逃がさないとグローバル変数は消える |
+| Built-in Prompt API(ローカル LLM)採用の本筋 | 2026-05-12 | 「無料」は副次的メリット。一番の決め手は spec 3.2 の「ページ本文を外部送信しない」プライバシー要件で、クラウド LLM(Bedrock/OpenAI)は最初から候補外 |
+| host_permissions の最小権限原則 | 2026-05-12 | `<all_urls>` は MV3 でも使えるが、5 URL に絞ることで「万一バグでページを誤って掴んでも関係ないサイトの情報が漏れるリスクが最初から陰性」になる |
 
 ---
 
@@ -82,6 +84,31 @@ node -v   # v22.22.2 が出ればOK
 
 **戻し方**: `mv ~/.npmrc.bak ~/.npmrc` で完全復元可。
 
+### 2026-05-12: `@crxjs/vite-plugin` 2.x の Rollup 4 脆弱性(GHSA-mw96-cpmx-2vgc)
+**症状**: `npm install` 後の `npm audit` で high severity 2 件が出る。発生源は CRXjs 2.x が依存する Rollup 4 の Path Traversal。
+
+**やってはいけないこと**: `npm audit fix --force` を打つと CRXjs を 1.0.14 にダウングレードする(2→1 の major down で破壊的変更)。
+
+**判断**: このまま無視。理由:
+- 攻撃ベクタは「ビルド時に悪意ある外部入力が path traversal を仕込む」だが、入力は自前で書く TS/JSON のみ
+- 開発時のみ走るビルドツール内の脆弱性で、配布物には影響しない
+- 本拡張は Web Store 公開せず Load Unpacked 個人運用
+
+**監視**: 次回 `@crxjs/vite-plugin` を更新するときは npm advisories を再確認し、Rollup が修正版に上がっていれば自然解消。
+
+### 2026-05-12: ESLint 9 flat config で `.prettierrc.json` を files に入れるとエラー
+**症状**: `files: ['eslint.config.js', '.prettierrc.json']` で設定ファイル全般を typed-lint 対象外にしようとしたら、`.prettierrc.json` が JS としてパースされて `@typescript-eslint/no-unused-expressions` で fail。
+
+**原因**: ESLint は files 指定された拡張子のファイルを **JS パーサで読む**。JSON ファイルを files に含めると JSON 構文が "expression" として解釈されてエラーになる。
+
+**対処**: `.prettierrc.json` を files から外す(JSON を ESLint で lint する意味はない)。
+```js
+{
+    files: ['eslint.config.js'],
+    ...tseslint.configs.disableTypeChecked,
+}
+```
+
 ---
 
 ## 4. 決定事項ログ
@@ -100,6 +127,16 @@ node -v   # v22.22.2 が出ればOK
 - システム置換は不可逆性が高くリスクが大きい
 
 **捨てたもの**: volta が持つ `package.json` の `volta` フィールド統合(現状不要)
+
+### 2026-05-12: M1 で spec から逸脱した 2 点
+**1. ESLint 設定ファイル名: spec 5 章の `.eslintrc.cjs` → 実装は `eslint.config.js`**
+- 理由: ESLint 9 (採用版 9.39.4) は flat config が標準で、`.eslintrc.cjs` のレガシー形式は廃止予定。flat config 一択。
+- 影響: 設定文法も別物(`module.exports` ではなく ESM の `export default`)。typescript-eslint も flat 用の `tseslint.config()` ヘルパで読み込む。
+
+**2. `manifest.json` の `icons` セクションを M1 では除外**
+- 理由: MV3 で `icons` は**必須ではない**(なければデフォルトのジグソーピースが使われる)。M1 のゴール「ビルドが通る + Load Unpacked できる」だけなら不要で、PNG ファイルを作る作業は M8 に回す。
+- 復活させるタイミング: M8 (受け入れ条件チェック)で 16/48/128 px の PNG を `public/icons/` に置いてから manifest に追記。
+- spec 6 章は将来像を示す参考として残し、実装側の manifest だけ M1 状態にしている。
 
 ---
 

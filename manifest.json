@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3,
+    "name": "AWS Docs Companion",
+    "version": "0.1.0",
+    "description": "AWS公式ドキュメントを中学生レベルに要約",
+    "minimum_chrome_version": "138",
+    "permissions": ["sidePanel", "storage", "scripting", "activeTab", "tabs"],
+    "host_permissions": [
+        "https://docs.aws.amazon.com/*",
+        "https://aws.amazon.com/blogs/*",
+        "https://aws.amazon.com/jp/blogs/*",
+        "https://aws.amazon.com/builders-library/*",
+        "https://aws.amazon.com/architecture/*"
+    ],
+    "background": {
+        "service_worker": "src/background/service-worker.ts",
+        "type": "module"
+    },
+    "action": {
+        "default_title": "AWS Docs Companion"
+    },
+    "side_panel": {
+        "default_path": "src/sidepanel/index.html"
+    }
+}

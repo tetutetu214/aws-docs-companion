@@ -6,9 +6,10 @@
 
 ## 進行中
 
-- [ ] てつてつ: `docs/knowledge.md` の「開発前の環境確認チェックリスト」を実機で確認
-- [ ] てつてつ: `docs/plan.md` をレビューして合意 or 修正指示
-- [ ] Claude: 合意後、理解度テストハーネスを通してから M1 着手
+- [x] Node 22 LTS 環境構築(nvm で v22.22.2、2026-05-12)
+- [x] 理解度テストハーネス 3 問: 全問正解(Manifest V3 SW / Built-in Prompt API / 最小権限、2026-05-12)
+- [ ] てつてつ: 残りの環境確認(`docs/knowledge.md` 1.1〜1.4 = Chrome 138+ / Gemini Nano / ハード要件 / `LanguageModel.availability()`)
+- [ ] **M1: ビルド基盤** 着手中
 
 ---
 
@@ -28,14 +29,16 @@
 - [x] Secret Scanning + Push Protection 有効化
 
 ### M1: ビルド基盤(chore)
-- [ ] `package.json` 雛形 + 依存追加(vite / @crxjs/vite-plugin / typescript / vitest / eslint / prettier / @mozilla/readability)
-- [ ] `tsconfig.json`(strict: true)
-- [ ] `vite.config.ts`(CRXjs プラグイン読み込み)
-- [ ] `manifest.json`(spec 6 章準拠)
-- [ ] `.eslintrc.cjs` + `.prettierrc`
-- [ ] `src/types/prompt-api.d.ts`(Built-in AI API 型定義の雛形)
-- [ ] `npm run build` が通って `dist/` ができることを確認
-- [ ] `dist/` を Load Unpacked で読み込めることを確認
+- [x] `package.json`(vite 8 / @crxjs 2.4 / TS 5.9 / Vitest 4.1 / ESLint 9.39 / Prettier 3.8 / Readability 0.6)
+- [x] `tsconfig.json`(strict + 追加チェック群)
+- [x] `vite.config.ts`(CRXjs + Vitest 統合)
+- [x] `manifest.json`(spec 6 章準拠、icons は M8 で追加)
+- [x] `eslint.config.js`(spec の `.eslintrc.cjs` から flat config に変更)+ `.prettierrc.json` + `.prettierignore`
+- [x] `src/types/prompt-api.d.ts`(Built-in AI API 型定義の雛形)
+- [x] スタブ: `src/background/service-worker.ts` / `src/sidepanel/index.html` / `src/sidepanel/main.ts`
+- [x] `npm run build` が通って `dist/` ができることを確認(116ms、5 ファイル生成)
+- [x] `npm run typecheck` / `npm run lint` / `npm run format:check` 全部グリーン
+- [ ] てつてつ: `dist/` を Load Unpacked で読み込めることを確認(Chrome 138+ 環境で)
 
 ### M2: URL 判定 & サイドパネル開閉(feat)
 - [ ] `src/lib/url-matcher.ts`(spec 2.2 の 5 パターン判定)

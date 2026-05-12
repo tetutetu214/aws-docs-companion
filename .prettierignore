@@ -1,0 +1,13 @@
+# 自動整形すると読みにくくなる手書き Markdown を除外
+CLAUDE.md
+README.md
+docs/
+
+# ビルド成果物とキャッシュ
+dist/
+node_modules/
+coverage/
+.vite/
+
+# package-lock は npm 管理
+package-lock.json
